@@ -1,0 +1,153 @@
+{% extends 'base.html' %}
+
+{% block link %}
+rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous"
+{% endblock %}
+
+{% block title %}
+Тестове завдання
+{% endblock %}
+
+{% block header %}
+<header class="site-header">
+    <ul class="nav">
+        <li class="nav-item">
+            <a class="nav-link active" href="/">Home</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" href="/get-endpoint-init">API Endpoint GET</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" href="/put-endpoint-init">API Endpoint PUT</a>
+        </li>
+    </ul>
+</header>
+{% endblock %}
+
+{% block body %}
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
+    <h3 style="text-align: center">Тестове завдання</h3>
+    <div class="container-1 d-flex flex-column align-items-center">
+        <div class="box-1">
+            <button id="start-job-1">Крок №1: Очищення PostgreSQL: таблиць Products та Reviews</button>
+            <div class="p-2" id="progress-1"></div>
+        </div>
+        <div class="box-2">
+            <button id="start-job-2">Крок №2: Парсинг Products.csv та Reviews.csv</button>
+            <div class="p-2" id="progress-2"></div>
+        </div>
+    </div>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/nanobar/0.4.2/nanobar.js"></script>
+
+    <script>
+        function start_task_1() {
+            // add task status elements
+            div = $('<div class="progress"><div style="width:10%;"></div><div style="width:10%;">0%</div><div style="width:60%;">...</div><div style="width:20%;">&nbsp;</div></div><hr>');
+            $('#progress-1').append(div);
+
+            // create a progress bar
+            var nanobar1 = new Nanobar({
+                bg: '#44f',
+                target: div[0].childNodes[0]
+            });
+
+            // send ajax POST request to start background job
+            $.ajax({
+                type: 'POST',
+                url: '/clear-db',
+                success: function(data, status, request) {
+                    status_url = request.getResponseHeader('Location');
+                    update_progress_1(status_url, nanobar1, div[0]);
+                },
+                error: function() {
+                    alert('Unexpected error');
+                }
+            });
+        }
+        function update_progress_1(status_url, nanobar1, status_div) {
+            // send GET request to status URL
+            $.getJSON(status_url, function(data) {
+                // update UI
+                percent = parseFloat(parseFloat(data['current'] * 100 / data['total']).toFixed(1));
+                nanobar1.go(percent);
+                $(status_div.childNodes[1]).text(percent + '%');
+                $(status_div.childNodes[2]).text(data['status']);
+                if (data['state'] != 'PENDING' && data['state'] != 'PROGRESS') {
+                    if ('result' in data) {
+                        // show result
+                        $(status_div.childNodes[3]).text('Результат: ' + data['result']);
+                    }
+                    else {
+                        // something unexpected happened
+                        $(status_div.childNodes[3]).text('Результат: ' + data['state']);
+                    }
+                }
+                else {
+                    // rerun in 2 seconds
+                    setTimeout(function() {
+                        update_progress_1(status_url, nanobar1, status_div);
+                    }, 2000);
+                }
+            });
+        }
+        $(function() {
+            $('#start-job-1').click(start_task_1);
+        });
+    </script>
+    <script>
+        function start_task_2() {
+            // add task status elements
+            div = $('<div class="progress"><div style="width:10%;"></div><div style="width:10%;">0%</div><div style="width:60%;">...</div><div style="width:20%;">&nbsp;</div></div><hr>');
+            $('#progress-2').append(div);
+
+            // create a progress bar
+            var nanobar2 = new Nanobar({
+                bg: '#44f',
+                target: div[0].childNodes[0]
+            });
+
+            // send ajax POST request to start background job
+            $.ajax({
+                type: 'POST',
+                url: '/clear-db',
+                success: function(data, status, request) {
+                    status_url = request.getResponseHeader('Location');
+                    update_progress_2(status_url, nanobar2, div[0]);
+                },
+                error: function() {
+                    alert('Unexpected error');
+                }
+            });
+        }
+        function update_progress_2(status_url, nanobar2, status_div) {
+            // send GET request to status URL
+            $.getJSON(status_url, function(data) {
+                // update UI
+                percent = parseFloat(parseFloat(data['current'] * 100 / data['total']).toFixed(1));
+                nanobar2.go(percent);
+                $(status_div.childNodes[1]).text(percent + '%');
+                $(status_div.childNodes[2]).text(data['status']);
+                if (data['state'] != 'PENDING' && data['state'] != 'PROGRESS') {
+                    if ('result' in data) {
+                        // show result
+                        $(status_div.childNodes[3]).text('Результат: ' + data['result']);
+                    }
+                    else {
+                        // something unexpected happened
+                        $(status_div.childNodes[3]).text('Результат: ' + data['state']);
+                    }
+                }
+                else {
+                    // rerun in 2 seconds
+                    setTimeout(function() {
+                        update_progress_2(status_url, nanobar2, status_div);
+                    }, 2000);
+                }
+            });
+        }
+        $(function() {
+            $('#start-job-2').click(start_task_2);
+        });
+    </script>
+{% endblock %}

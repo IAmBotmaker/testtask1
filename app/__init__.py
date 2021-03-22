@@ -12,7 +12,7 @@ conn = psycopg2.connect(dbname=app.config["DB_NAME"], user=app.config["DB_USER"]
                         password=app.config["DB_PASS"], host=app.config["DB_HOST"])
 cursor = conn.cursor()
 
-from app import routes, models
+from app import routes, models, tasks
 
 # To create tables in Heroku PostgreSQL execute in Python Console:
 #from app import db

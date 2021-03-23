@@ -110,7 +110,7 @@ rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bo
             // send ajax POST request to start background job
             $.ajax({
                 type: 'POST',
-                url: '/clear-db',
+                url: '/parse-csv',
                 success: function(data, status, request) {
                     status_url = request.getResponseHeader('Location');
                     update_progress_2(status_url, nanobar2, div[0]);

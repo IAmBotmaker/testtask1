@@ -1,6 +1,7 @@
 from app import app
-from flask import render_template, jsonify, url_for
+from flask import render_template, jsonify, url_for, request
 from .tasks import celery_task_del_table_content, celery_task_parse_csv_to_db
+from app.models import Products, Reviews
 
 
 @app.route('/')
@@ -21,9 +22,23 @@ def parse_csv():
     return jsonify({}), 202, {'Location': url_for('taskstatus2', task_id=task2_command.id)}
 
 @app.route('/get-endpoint-init', methods=['GET', 'POST'])
-def get_endpoint():
-    #task3_command = celery_task_get_endpoint.apply_async()
-    return render_template('get-endpoint.html')
+def get_endpoint_init():
+    products = Products.query.all()
+    return render_template('get-endpoint.html', products=products)
+
+@app.route('/get-endpoint-jinja/<int:num>', methods=['GET'])
+def get_endpoint_specific(num):
+    product = Products.query.filter_by(id = num).first()
+    #pagination
+    page = request.args.get('page', 1, type=int)
+    reviews = product.reviews.paginate(page, app.config['REVIEWS_PER_PAGE'], False)
+    next_url = url_for('get_endpoint_specific', num=product.id , page=reviews.next_num) \
+        if reviews.has_next else None
+    print("next_url", next_url)
+    prev_url = url_for('get_endpoint_specific', num=product.id, page=reviews.prev_num) \
+        if reviews.has_prev else None
+    print("prev_url", prev_url)
+    return render_template('get-endpoint-specific-jinja.html', product=product, reviews=reviews.items, next_url=next_url, prev_url=prev_url)
 
 @app.route('/put-endpoint-init', methods=['GET', 'POST'])
 def put_endpoint():

@@ -1,0 +1,74 @@
+{% extends 'base.html' %}
+
+{% block link %}
+rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous"
+{% endblock %}
+
+{% block title %}
+Test task
+{% endblock %}
+
+{% block header %}
+<header class="site-header">
+    <ul class="nav">
+        <li class="nav-item">
+            <a class="nav-link" href="/">Home</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link active" href="/get-endpoint-init">API Endpoint GET</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" href="/put-endpoint-init">API Endpoint PUT</a>
+        </li>
+    </ul>
+</header>
+{% endblock %}
+
+{% block body %}
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
+    <h3 style="text-align: center">Test task - API Endpoint GET - response<br> - as Jinja template rendered</h3>
+    <table class="table" style="margin-top: 10px;" id="selected_product_table">
+        <thead>
+            <tr>
+                <th class="text-center align-middle">Product no.</th>
+                <th class="text-center align-middle">Product description</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>{{ product.id }}</td>
+                <td>
+                    <table class="table" style="margin-top: 10px;" id="selected_product_details_table">
+                        <thead>
+                            <tr>
+                                <th class="text-center align-middle">ASIN</th>
+                                <th class="text-center align-middle">Title</th>
+                                <th class="text-center align-middle">Reviews</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>{{ product.asin }}</td>
+                                <td>{{ product.title }}</td>
+                                <td>
+                                    {% for review in reviews %}
+                                        Review:<br> {{review.review}}<br><br>
+                                    {% endfor %}
+                                    {% if prev_url %}
+                                        <a href="{{ prev_url }}">Prev reviews</a>
+                                    {% endif %}
+                                    {% if next_url %}
+                                        <a href="{{ next_url }}">Next reviews</a>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                         </tbody>
+                    </table>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+
+{% endblock %}
+</html>

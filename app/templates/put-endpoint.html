@@ -15,10 +15,10 @@ Test task
             <a class="nav-link" href="/">Home</a>
         </li>
         <li class="nav-item">
-            <a class="nav-link" href="/get-endpoint-init">API Endpoint GET</a>
+            <a class="nav-link active" href="/get-endpoint-init">API Endpoint GET</a>
         </li>
         <li class="nav-item">
-            <a class="nav-link active" href="/put-endpoint-init">API Endpoint PUT</a>
+            <a class="nav-link" href="/put-endpoint-init">API Endpoint PUT</a>
         </li>
     </ul>
 </header>
@@ -28,8 +28,23 @@ Test task
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
     <h3 style="text-align: center">Test task - API Endpoint PUT</h3>
-
-
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/nanobar/0.4.2/nanobar.js"></script>
+    <table class="table" style="margin-top: 10px;" id="products_table">
+        <thead>
+            <tr>
+                <th class="text-center align-middle">Product no.</th>
+                <th class="text-center align-middle">PUT endpoint - via HTML form</th>
+                <th class="text-center align-middle">PUT endpoint - via Json (up)load</th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for p in products %}
+            <tr>
+                <td>{{ p.id }}</td>
+                <td><a href="/put-endpoint-html-form/{{ p.id }}">{{ p.id }} - HTML form</a></td>
+                <td><a href="/api/put-endpoint-json-load/{{ p.id }}">{{ p.id }} - Json (up)load</a></td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
 
 {% endblock %}

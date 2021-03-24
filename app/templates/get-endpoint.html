@@ -33,7 +33,7 @@ Test task
             <tr>
                 <th class="text-center align-middle">Product no.</th>
                 <th class="text-center align-middle">GET endpoint - render Jinja HTML</th>
-                <th class="text-center align-middle">GET endpoint - json as response</th>
+                <th class="text-center align-middle">GET endpoint - json as response*</th>
             </tr>
         </thead>
         <tbody>
@@ -46,5 +46,8 @@ Test task
         {% endfor %}
         </tbody>
     </table>
+    <div class="font-italic">
+        * REST API paginagition format http://localhost:5000/api/get-endpoint-json/id?page=page_number   OR   http://localhost:5000/api/get-endpoint-json/id (default for page=1)
+    </div>
 
 {% endblock %}

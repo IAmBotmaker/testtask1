@@ -28,11 +28,16 @@ def get_paginated_list(klass, url, page, per_page, limit, id):
     # prepare list of reviews for selected page
     list_of_chunks = list(chunks(reviews_list, per_page))
     number_of_pages = len(list_of_chunks)
-    # if requested page number is larger than number of pages
-    if (page > number_of_pages):
-        abort(404)
-        #error_response(404)
-    reviews_list_selected_page = list_of_chunks[page - 1]
+    # if requested page number is larger than number of pages - abort
+    reviews_list_selected_page = []
+    if number_of_pages >= 1:
+        if (page > number_of_pages and number_of_pages != 0):
+            abort(404)
+            # error_response(404)
+        else:
+            reviews_list_selected_page = list_of_chunks[page - 1]
+    else:
+        reviews_list_selected_page = []
 
     # make response object - OrderedDict
     obj = collections.OrderedDict()
@@ -45,7 +50,7 @@ def get_paginated_list(klass, url, page, per_page, limit, id):
     obj['limit'] = limit
     obj['previous'] = ''
     obj['next'] = ''
-    obj['results'] = []
+    obj['reviews'] = []
 
     # make URLs
 
@@ -61,15 +66,18 @@ def get_paginated_list(klass, url, page, per_page, limit, id):
         obj['next'] = url + '?page=%d' % (page + 1,)
 
     # finally extract result according to bounds
-    list_of_reviews = []
-    list_of_reviews_dic = {"title": "",
-                           "review": ""}
-    for i in range(len(reviews_list_selected_page)):
-        list_of_reviews_dic["title"] = reviews_list_selected_page[i].title
-        list_of_reviews_dic["review"] = reviews_list_selected_page[i].review
-        list_of_reviews.append(list_of_reviews_dic.copy())
+    if number_of_pages >= 1:
+        list_of_reviews = []
+        list_of_reviews_dic = {"title": "",
+                               "review": ""}
+        for i in range(len(reviews_list_selected_page)):
+            list_of_reviews_dic["title"] = reviews_list_selected_page[i].title
+            list_of_reviews_dic["review"] = reviews_list_selected_page[i].review
+            list_of_reviews.append(list_of_reviews_dic.copy())
 
-    obj['results'] = list_of_reviews
+        obj['reviews'] = list_of_reviews
+    else:
+        obj['reviews'] = []
     return obj
 
 

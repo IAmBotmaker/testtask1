@@ -1,30 +1,39 @@
-from os import abort
 from app import app
 from app.api import bp
 import collections
-from flask import jsonify, request
+from flask import jsonify, request, abort
 from app.models import Products
+#from .errors import error_response
 
 
 def get_paginated_list(klass, url, page, per_page, limit, id):
-
     def chunks(lst, n):
         """Yield successive n-sized chunks from lst."""
         for f in range(0, len(lst), n):
             yield lst[f:f + n]
 
+    if (page <= 0):
+        abort(404)
+        #error_response(404)
+
     # check if page exists
     product_obj_instance = klass.query.get_or_404(id)
-    # get reviews list
+
+    # get raw reviews list
     reviews_list = product_obj_instance.reviews.all()
-    # number of reviews
+    # number of raw reviews
+    reviews_list = reviews_list[:limit]
     count = len(reviews_list)
-    # if requested page number is larger than number of possible pages (count//per_page+1)
-    if (page > (count//per_page + 1)):
-        abort(404)
+
     # prepare list of reviews for selected page
     list_of_chunks = list(chunks(reviews_list, per_page))
+    number_of_pages = len(list_of_chunks)
+    # if requested page number is larger than number of pages
+    if (page > number_of_pages):
+        abort(404)
+        #error_response(404)
     reviews_list_selected_page = list_of_chunks[page - 1]
+
     # make response object - OrderedDict
     obj = collections.OrderedDict()
     obj['id'] = product_obj_instance.id
@@ -44,18 +53,22 @@ def get_paginated_list(klass, url, page, per_page, limit, id):
     if page == 1:
         obj['previous'] = ''
     else:
-        obj['previous'] = url + '?page=%d' % (page - 1, ) #TODO page counters
+        obj['previous'] = url + '?page=%d' % (page - 1,)
 
-    # make next url
-    if page == (count//per_page + 1): #TODO page counters
+    if page == number_of_pages:
         obj['next'] = ''
     else:
-        obj['next'] = url + '?page=%d' % (page + 1, )
+        obj['next'] = url + '?page=%d' % (page + 1,)
 
-    # finally extract result according to bounds #TODO limit
+    # finally extract result according to bounds
     list_of_reviews = []
+    list_of_reviews_dic = {"title": "",
+                           "review": ""}
     for i in range(len(reviews_list_selected_page)):
-        list_of_reviews.append(reviews_list_selected_page[i].review)
+        list_of_reviews_dic["title"] = reviews_list_selected_page[i].title
+        list_of_reviews_dic["review"] = reviews_list_selected_page[i].review
+        list_of_reviews.append(list_of_reviews_dic.copy())
+
     obj['results'] = list_of_reviews
     return obj
 

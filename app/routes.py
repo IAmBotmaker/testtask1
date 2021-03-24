@@ -21,28 +21,32 @@ def parse_csv():
     task2_command = celery_task_parse_csv_to_db.apply_async()
     return jsonify({}), 202, {'Location': url_for('taskstatus2', task_id=task2_command.id)}
 
+
 @app.route('/get-endpoint-init', methods=['GET', 'POST'])
 def get_endpoint_init():
     products = Products.query.all()
     return render_template('get-endpoint.html', products=products)
 
+
 @app.route('/get-endpoint-jinja/<int:num>', methods=['GET'])
-def get_endpoint_specific(num):
-    product = Products.query.filter_by(id = num).first()
-    #pagination
+def get_endpoint_specific_jinja(num):  # num is a product id argument
+    product = Products.query.filter_by(id=num).first()
+    # pagination
     page = request.args.get('page', 1, type=int)
     reviews = product.reviews.paginate(page, app.config['REVIEWS_PER_PAGE'], False)
-    next_url = url_for('get_endpoint_specific', num=product.id , page=reviews.next_num) \
+    next_url = url_for('get_endpoint_specific_jinja', num=product.id, page=reviews.next_num) \
         if reviews.has_next else None
     print("next_url", next_url)
-    prev_url = url_for('get_endpoint_specific', num=product.id, page=reviews.prev_num) \
+    prev_url = url_for('get_endpoint_specific_jinja', num=product.id, page=reviews.prev_num) \
         if reviews.has_prev else None
     print("prev_url", prev_url)
-    return render_template('get-endpoint-specific-jinja.html', product=product, reviews=reviews.items, next_url=next_url, prev_url=prev_url)
+    return render_template('get-endpoint-specific-jinja.html', product=product, reviews=reviews.items,
+                           next_url=next_url, prev_url=prev_url)
+
 
 @app.route('/put-endpoint-init', methods=['GET', 'POST'])
 def put_endpoint():
-    #task4_command = celery_task_put_endpoint.apply_async()
+    # task4_command = celery_task_put_endpoint.apply_async()
     return render_template('put-endpoint.html')
 
 
@@ -83,6 +87,7 @@ def taskstatus1(task_id):
             'status': str(task.info),  # this is the exception raised
         }
     return jsonify(response)
+
 
 @app.route('/status2/<task_id>')
 def taskstatus2(task_id):

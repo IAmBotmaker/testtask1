@@ -14,6 +14,9 @@ cursor = conn.cursor()
 
 from app import routes, models, tasks
 
+from app.api import bp as api_bp
+app.register_blueprint(api_bp, url_prefix='/api')
+
 # To create tables in Heroku PostgreSQL execute in Python Console:
 #from app import db
 #db.create_all()

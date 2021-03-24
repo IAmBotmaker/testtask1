@@ -31,19 +31,37 @@ Test task
     <table class="table" style="margin-top: 10px;" id="products_table">
         <thead>
             <tr>
-                <th class="text-center align-middle">Product no.</th>
-                <th class="text-center align-middle">PUT endpoint - via HTML form</th>
-                <th class="text-center align-middle">PUT endpoint - via Json (up)load</th>
             </tr>
         </thead>
         <tbody>
-        {% for p in products %}
             <tr>
-                <td>{{ p.id }}</td>
-                <td><a href="/put-endpoint-html-form/{{ p.id }}">{{ p.id }} - HTML form</a></td>
-                <td><a href="/api/put-endpoint-json-load/{{ p.id }}">{{ p.id }} - Json (up)load</a></td>
+                <div class="text-center align-middle"><h4>Info channeled from POST HTML form to PUT endpoint and saved to PostreSQL</h4></div>
+                <div class="text-center"><h5>Please, input new review:</h5></div>
             </tr>
-        {% endfor %}
+            <tr>
+                <form method="POST">
+                    <input type="hidden" name="_method" value="put" />
+                    {{ form.hidden_tag() }}
+                    <fieldset class="form-group">
+                        <legend class="border-bottom mb-4">Add information below:</legend>
+                        <div class="form-group">
+                            {{ form.product_id.label(class="form-control-label") }}
+                            {{ form.product_id(class="form-control form-control-lg") }}
+                        </div>
+                        <div class="form-group">
+                            {{ form.title.label(class="form-control-label") }}
+                            {{ form.title(class="form-control form-control-lg") }}
+                        </div>
+                        <div class="form-group">
+                            {{ form.review.label(class="form-control-label") }}
+                            {{ form.review(class="form-control form-control-lg") }}
+                        </div>
+                    </fieldset>
+                    <div class="form-group">
+                        {{ form.submit(class="btn btn-outline-info") }}
+                    </div>
+                </form>
+            </tr>
         </tbody>
     </table>
 

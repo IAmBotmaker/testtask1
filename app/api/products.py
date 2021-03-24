@@ -1,9 +1,10 @@
 import json
-from app import app, redis_client
+from app import app, redis_client, db
 from app.api import bp
 import collections
 from flask import jsonify, request, abort
-from app.models import Products
+from app.models import Products, Reviews
+from datetime import timedelta
 
 
 # Pagination function
@@ -101,9 +102,28 @@ def get_endpoint_specific_json(num):
             id=num)
         # Saving data to cache with unique identifier for product id & page number
         redis_client.set(cached_response_redis_key, json.dumps(result))
+        redis_client.expire(cached_response_redis_key, timedelta(seconds=10))
     else:
         print("Found cached GET response, serving data from REDIS")
         result = json.loads(result)
 
     return jsonify(result)  # does not keep order, but beautified
     # return json.dumps(result)  # does keep order
+
+
+@bp.route('/put-endpoint-json/<int:num>', methods=['PUT'])
+def put_endpoint_specific_json(num):
+    product_id = num
+    product_obj_instance = Products.query.get_or_404(product_id)
+    asin = product_obj_instance.asin
+    title = request.json['title']
+    review = request.json['review']
+    product_ids = product_id
+
+    new_review = Reviews(asin=asin, title=title, review=review, product_ids=product_ids)
+    db.session.add(new_review)
+    db.session.commit()
+
+    new_review_obj_instance = Reviews.query.order_by(-Reviews.id).filter_by(product_ids=product_ids).first().as_dict()
+
+    return jsonify(new_review_obj_instance)

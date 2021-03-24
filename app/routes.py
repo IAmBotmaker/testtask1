@@ -1,7 +1,10 @@
 from app import app
-from flask import render_template, jsonify, url_for, request
+from flask import render_template, jsonify, url_for, request, flash, redirect
 from .tasks import celery_task_del_table_content, celery_task_parse_csv_to_db
 from app.models import Products
+from app.forms import putNewReviewForm
+import requests
+from app.api.products import put_endpoint_specific_json
 
 
 @app.route('/')
@@ -45,9 +48,20 @@ def get_endpoint_specific_jinja(num):  # num is a product id argument
 
 
 @app.route('/put-endpoint-init', methods=['GET', 'POST'])
-def put_endpoint():
-    # task4_command = celery_task_put_endpoint.apply_async()
-    return render_template('put-endpoint.html')
+def put_endpoint_init():
+    form = putNewReviewForm()
+    if form.validate_on_submit():
+        url_root = request.url_root
+        url = url_root + "api/put-endpoint-json/" + str(form.product_id.data)
+        payload = "{\n    \"title\": \"" + form.title.data + "\",\n    \"review\": \"" + form.review.data + "\"\n}"
+        headers = {
+            'Content-Type': 'application/json'
+        }
+        response = requests.request("PUT", url, headers=headers, data=payload)
+        print(response.text)
+        flash(f'New review added for product with id #{form.product_id}!', 'success')
+        return redirect(url_for('put_endpoint_init'))
+    return render_template('put-endpoint.html', form=form)
 
 
 @app.route('/status1/<task_id>')

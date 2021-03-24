@@ -5,7 +5,7 @@ rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bo
 {% endblock %}
 
 {% block title %}
-Тестове завдання
+Test task
 {% endblock %}
 
 {% block header %}
@@ -27,14 +27,14 @@ rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bo
 {% block body %}
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
-    <h3 style="text-align: center">Тестове завдання</h3>
+    <h3 style="text-align: center">Test task</h3>
     <div class="container-1 d-flex flex-column align-items-center">
         <div class="box-1">
-            <button id="start-job-1">Крок №1: Очищення PostgreSQL: таблиць Products та Reviews</button>
+            <button id="start-job-1">Step #1: Dropping and recreation of PostgreSQL tables: Products and Reviews</button>
             <div class="p-2" id="progress-1"></div>
         </div>
         <div class="box-2">
-            <button id="start-job-2">Крок №2: Парсинг Products.csv та Reviews.csv</button>
+            <button id="start-job-2">Step #2: Parsing of Products.csv and Reviews.csv</button>
             <div class="p-2" id="progress-2"></div>
         </div>
     </div>
@@ -76,11 +76,11 @@ rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bo
                 if (data['state'] != 'PENDING' && data['state'] != 'PROGRESS') {
                     if ('result' in data) {
                         // show result
-                        $(status_div.childNodes[3]).text('Результат: ' + data['result']);
+                        $(status_div.childNodes[3]).text('Result: ' + data['result']);
                     }
                     else {
                         // something unexpected happened
-                        $(status_div.childNodes[3]).text('Результат: ' + data['state']);
+                        $(status_div.childNodes[3]).text('Result: ' + data['state']);
                     }
                 }
                 else {
@@ -131,11 +131,11 @@ rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bo
                 if (data['state'] != 'PENDING' && data['state'] != 'PROGRESS') {
                     if ('result' in data) {
                         // show result
-                        $(status_div.childNodes[3]).text('Результат: ' + data['result']);
+                        $(status_div.childNodes[3]).text('Result: ' + data['result']);
                     }
                     else {
                         // something unexpected happened
-                        $(status_div.childNodes[3]).text('Результат: ' + data['state']);
+                        $(status_div.childNodes[3]).text('Result: ' + data['state']);
                     }
                 }
                 else {

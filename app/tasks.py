@@ -12,8 +12,8 @@ def celery_task_del_table_content(self):
     db.create_all()
     db.session.close()
     print("celery_task_del_table_content - PASSED")
-    return {'current': 100, 'total': 100, 'status': 'Очищення таблиць Products та Reviews в базі PostgreSQL відбулося '
-                                                    'успішно!', 'result': "Успішно!"}
+    return {'current': 100, 'total': 100, 'status': 'Dropping and recreation of tables Products and Reviews '
+                                                    'in PostgreSQL is successful!', 'result': "SUCCESS!"}
 
 
 # Step#2 Parsing data from Products.csv and Reviews.csv to PostgreSQL db
@@ -58,5 +58,5 @@ def celery_task_parse_csv_to_db(self):
     df_reviews.to_sql(name='reviews', con=db.engine, index=False, if_exists="append")
 
     print("celery_task_parse_csv_to_db - PASSED")
-    return {'current': 100, 'total': 100, 'status': 'Парсінг Products.csv та Reviews.csv в базу PostgreSQL відбувся '
-                                                    'успішно!', 'result': "Успішно!"}
+    return {'current': 100, 'total': 100, 'status': 'Parsing of Products.csv and Reviews.csv to PostgreSQL database '
+                                                    'is successful!', 'result': "SUCCESS!"}

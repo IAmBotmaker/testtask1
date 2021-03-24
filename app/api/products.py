@@ -1,11 +1,12 @@
-from app import app
+import json
+from app import app, redis_client
 from app.api import bp
 import collections
 from flask import jsonify, request, abort
 from app.models import Products
-#from .errors import error_response
 
 
+# Pagination function
 def get_paginated_list(klass, url, page, per_page, limit, id):
     def chunks(lst, n):
         """Yield successive n-sized chunks from lst."""
@@ -14,14 +15,14 @@ def get_paginated_list(klass, url, page, per_page, limit, id):
 
     if (page <= 0):
         abort(404)
-        #error_response(404)
 
-    # check if page exists
+    # check if product exists in the PostgreSQL database
     product_obj_instance = klass.query.get_or_404(id)
 
     # get raw reviews list
     reviews_list = product_obj_instance.reviews.all()
-    # number of raw reviews
+    # number of raw reviews limited by maximum number of reviews allowed (set in config.py as REVIEWS_MAX)
+    # to be served by REST API GET
     reviews_list = reviews_list[:limit]
     count = len(reviews_list)
 
@@ -33,7 +34,6 @@ def get_paginated_list(klass, url, page, per_page, limit, id):
     if number_of_pages >= 1:
         if (page > number_of_pages and number_of_pages != 0):
             abort(404)
-            # error_response(404)
         else:
             reviews_list_selected_page = list_of_chunks[page - 1]
     else:
@@ -83,12 +83,27 @@ def get_paginated_list(klass, url, page, per_page, limit, id):
 
 @bp.route('/get-endpoint-json/<int:num>', methods=['GET'])
 def get_endpoint_specific_json(num):
-    result = get_paginated_list(
-        Products,
-        '/get-endpoint-json/' + str(num),
-        page=request.args.get('page', 1, type=int),
-        per_page=app.config['REVIEWS_PER_PAGE'],
-        limit=app.config['REVIEWS_MAX'],
-        id=num)
+    page = request.args.get('page', 1, type=int)
+    # creating unique redis key for product id & page number
+    cached_response_redis_key = f"result_{num}_{page}"
+    # REDIS cache used
+    # Trying to get data from cache with unique redis key
+    result = redis_client.get(cached_response_redis_key)
+    if result is None:
+        print("Could not find GET result in cache, REST API response served from PostgreSQL db")
+        # Getting data from the PostgreSQL db
+        result = get_paginated_list(
+            Products,
+            '/get-endpoint-json/' + str(num),
+            page=request.args.get('page', 1, type=int),
+            per_page=app.config['REVIEWS_PER_PAGE'],
+            limit=app.config['REVIEWS_MAX'],
+            id=num)
+        # Saving data to cache with unique identifier for product id & page number
+        redis_client.set(cached_response_redis_key, json.dumps(result))
+    else:
+        print("Found cached GET response, serving data from REDIS")
+        result = json.loads(result)
+
     return jsonify(result)  # does not keep order, but beautified
     # return json.dumps(result)  # does keep order

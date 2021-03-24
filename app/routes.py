@@ -1,7 +1,7 @@
 from app import app
 from flask import render_template, jsonify, url_for, request
 from .tasks import celery_task_del_table_content, celery_task_parse_csv_to_db
-from app.models import Products, Reviews
+from app.models import Products
 
 
 @app.route('/')
@@ -60,14 +60,14 @@ def taskstatus1(task_id):
             'state': task.state,
             'current': 0,
             'total': 1,
-            'status': 'Підготовка до очищення бази даних PostgreSQL...'
+            'status': 'Preparation for clearing of PostgreSQL...'
         }
     elif task.state == 'RETRY':
         response = {
             'state': task.state,
             'current': 0,
             'total': 1,
-            'status': 'Пробуємо відновити роботу...'
+            'status': 'Trying to resume work...'
         }
     elif task.state != 'FAILURE':
         response = {
@@ -99,14 +99,14 @@ def taskstatus2(task_id):
             'state': task.state,
             'current': 0,
             'total': 1,
-            'status': 'Підготовка до парсингу даних з csv файлів...'
+            'status': 'Preparing to parse data from csv files...'
         }
     elif task.state == 'RETRY':
         response = {
             'state': task.state,
             'current': 0,
             'total': 1,
-            'status': 'Пробуємо відновити роботу...'
+            'status': 'Trying to resume work...'
         }
     elif task.state != 'FAILURE':
         response = {
